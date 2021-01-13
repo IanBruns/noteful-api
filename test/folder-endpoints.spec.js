@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const knex = require('knex');
-const { compile } = require('morgan');
 const supertest = require('supertest');
 const app = require('../src/app');
 const { makeFoldersArray, makeMaliciousImgFolder } = require('./folders.fixtures');
@@ -162,7 +161,7 @@ describe('Folder Endpoints', () => {
         });
     });
 
-    describe.only('PATCH api/folders/:folder_id', () => {
+    describe('PATCH api/folders/:folder_id', () => {
         context('when there are no items in the database', () => {
             it('retuns a 404 and an error for the folder', () => {
                 const testId = 1612;
