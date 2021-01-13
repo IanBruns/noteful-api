@@ -24,7 +24,7 @@ describe('Folder Endpoints', () => {
     afterEach('cleanup notes', () => db('notes').truncate());
     afterEach('cleanup folders', () => db.raw('TRUNCATE folders RESTART IDENTITY CASCADE'));
 
-    describe.only('GET /api/notes', () => {
+    describe('GET /api/notes', () => {
         context('given no notes in the folders', () => {
             it('returns a 200 and an empty array', () => {
                 return supertest(app)
@@ -51,6 +51,21 @@ describe('Folder Endpoints', () => {
                 return supertest(app)
                     .get('/api/notes')
                     .expect(200, testNotes);
+            });
+        });
+    });
+
+    describe.only('GET api/notes/:note_id', () => {
+        context('when there are no notes in the database', () => {
+            it('returns a 404 and an error for the note', () => {
+                const testId = 1612;
+
+                return supertest(app)
+                    .get(`/api/notes/${testId}`)
+                    .expect(404)
+                    .expect({
+                        error: { message: 'Note does not exist' }
+                    });
             });
         });
     });
