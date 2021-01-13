@@ -7,7 +7,9 @@ const jsonBodyParser = express.json();
 
 const serializeNote = note => ({
     id: note.id,
-    note_name: xss(note.note_name)
+    note_name: xss(note.note_name),
+    content: xss(note.content),
+    assigned_folder: note.assigned_folder
 });
 
 noteRouter
@@ -16,7 +18,7 @@ noteRouter
         const knexInstance = req.app.get('db');
         NoteService.getAllNotes(knexInstance)
             .then(notes => {
-                res.json(notes);
+                res.json(notes.map(serializeNote));
             })
             .catch(next);
     });

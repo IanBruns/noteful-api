@@ -46,6 +46,12 @@ describe('Folder Endpoints', () => {
                 return db.into('notes')
                     .insert(testNotes);
             });
+
+            it('returns a 200 and all notes', () => {
+                return supertest(app)
+                    .get('/api/notes')
+                    .expect(200, testNotes);
+            });
         });
     });
 });
