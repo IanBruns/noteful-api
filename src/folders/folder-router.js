@@ -69,5 +69,29 @@ folderRouter
             })
             .catch(next);
     })
+    .patch(jsonBodyParser, (req, res, next) => {
+        const knexInstance = req.app.get('db');
+        const { folder_name } = req.body;
+        const folderToUpdate = { folder_name };
+        const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length;
+
+        if (numberOfValues === 0) {
+            return res.status(400).json({
+                error: {
+                    message: 'Request body must contain a valid folder_name'
+                }
+            });
+        }
+
+        FolderService.updateFolder(
+            knexInstance,
+            req.params.folder_id,
+            folderToUpdate
+        )
+            .then(numRowsAffected => {
+                res.status(204).end();
+            })
+            .catch(next);
+    });
 
 module.exports = folderRouter;
