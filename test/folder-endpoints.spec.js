@@ -80,7 +80,7 @@ describe('Folder Endpoints', () => {
         });
     });
 
-    describe.only('POST /api/folders', () => {
+    describe('POST /api/folders', () => {
         it('creates a folder responding with a 201 then the new folder', () => {
             const newFolder = { folder_name: 'New Folder' };
 
@@ -123,4 +123,23 @@ describe('Folder Endpoints', () => {
                 });
         });
     });
+
+    describe.only('DELETE /api/folders/:folder_id'){
+        context('When the database is empty', () => {
+            it('Returns a 400 and an error', () => {
+                context('given no folders in the database', () => {
+                    it('retuns a 404 and an error for the folder', () => {
+                        const testId = 1612;
+
+                        return supertest(app)
+                            .delete(`/api/folders/${testId}`)
+                            .expect(404)
+                            .expect({
+                                error: { message: 'Folder does not exist' }
+                            });
+                    });
+                });
+            })
+        })
+    }
 });

@@ -18,6 +18,12 @@ const FolderService = {
             .where('id', id)
             .first();
     },
+    deleteFolder(knex, id) {
+        return knex
+            .from('folders')
+            .where({ id })
+            .delete();
+    }
 };
 
 module.exports = FolderService;

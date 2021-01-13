@@ -60,6 +60,14 @@ folderRouter
     })
     .get((req, res, next) => {
         res.json(serializeFolder(res.folder));
-    });
+    })
+    .delete((req, res, next) => {
+        const knexInstance = req.app.get('db');
+        FolderService.deleteFolder(knexInstance, req.params.folder_id)
+            .then(numRowsAffected => {
+                res.status(204).end();
+            })
+            .catch(next);
+    })
 
 module.exports = folderRouter;
