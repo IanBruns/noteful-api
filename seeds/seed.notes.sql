@@ -1,6 +1,7 @@
 BEGIN;
 
-INSERT INTO notes (note_name, content, assigned_folder)
+INSERT INTO note (note_name, content, assigned_folder)
+VALUES
 ('One', 'You are like a dream come true', 1),
 ('Two', 'Just wanna be with you', 2),
 ('Three', 'Girl, it is plain to see', 3),

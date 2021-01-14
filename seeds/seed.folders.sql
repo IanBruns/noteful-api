@@ -1,6 +1,6 @@
 BEGIN;
 
-INSERT INTO folders (folder_name)
+INSERT INTO folder (folder_name)
 VALUES
 ('One'),
 ('Two'),
