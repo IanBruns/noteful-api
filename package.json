@@ -11,11 +11,11 @@
     "migrate:production": "heroku run npm run migrate",
     "start": "node src/server.js",
     "postdeploy": "npm run migrate:production",
-    "deploy": "git push heroku master:main"
+    "deploy": "git push heroku main"
   },
   "keywords": [],
   "engines": {
-    "node": "14.15.1"
+    "node": "12.20.0"
   },
   "author": "",
   "license": "ISC",
