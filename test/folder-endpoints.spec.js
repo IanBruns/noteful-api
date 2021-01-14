@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const knex = require('knex');
 const supertest = require('supertest');
 const app = require('../src/app');
-const { makeFoldersArray, makeMaliciousImgFolder } = require('./folders.fixtures');
+const { makeFolderArray, makeMaliciousImgFolder } = require('./folder.fixtures');
 
 describe('Folder Endpoints', () => {
     let db;
@@ -17,42 +17,42 @@ describe('Folder Endpoints', () => {
 
     after('disconnect from the database', () => db.destroy());
 
-    before('clean the table', () => db.raw('TRUNCATE folders RESTART IDENTITY CASCADE'));
+    before('clean the table', () => db.raw('TRUNCATE folder RESTART IDENTITY CASCADE'));
 
-    afterEach('cleanup', () => db.raw('TRUNCATE folders RESTART IDENTITY CASCADE'));
+    afterEach('cleanup', () => db.raw('TRUNCATE folder RESTART IDENTITY CASCADE'));
 
-    describe('/GET /api/folders', () => {
-        context('given no folders in the database', () => {
+    describe('/GET /api/folder', () => {
+        context('given no folder in the database', () => {
             it('returns a 200 and an empty list', () => {
                 return supertest(app)
-                    .get('/api/folders')
+                    .get('/api/folder')
                     .expect(200, []);
             });
         });
 
-        context('given folders in the database', () => {
-            const testFolders = makeFoldersArray();
+        context('given folder in the database', () => {
+            const testFolder = makeFolderArray();
 
-            beforeEach('insert folders', () => {
-                return db.into('folders')
-                    .insert(testFolders);
+            beforeEach('insert folder', () => {
+                return db.into('folder')
+                    .insert(testFolder);
             });
 
-            it('returns with a 200 and the array of folders', () => {
+            it('returns with a 200 and the array of folder', () => {
                 return supertest(app)
-                    .get('/api/folders')
-                    .expect(200, testFolders);
+                    .get('/api/folder')
+                    .expect(200, testFolder);
             });
         });
     });
 
-    describe('GET /api/folders/:folder_id', () => {
-        context('given no folders in the database', () => {
+    describe('GET /api/folder/:folder_id', () => {
+        context('given no folder in the database', () => {
             it('retuns a 404 and an error for the folder', () => {
                 const testId = 1612;
 
                 return supertest(app)
-                    .get(`/api/folders/${testId}`)
+                    .get(`/api/folder/${testId}`)
                     .expect(404)
                     .expect({
                         error: { message: 'Folder does not exist' }
@@ -60,31 +60,31 @@ describe('Folder Endpoints', () => {
             });
         });
 
-        context('given folders in the database', () => {
-            const testFolders = makeFoldersArray();
+        context('given folder in the database', () => {
+            const testFolder = makeFolderArray();
 
-            beforeEach('insert folders', () => {
-                return db.into('folders')
-                    .insert(testFolders);
+            beforeEach('insert folder', () => {
+                return db.into('folder')
+                    .insert(testFolder);
             });
 
             it('returns a 200 and the expected folder', () => {
                 const testId = 2;
-                const expectedFolder = testFolders[testId - 1];
+                const expectedFolder = testFolder[testId - 1];
 
                 return supertest(app)
-                    .get(`/api/folders/${testId}`)
+                    .get(`/api/folder/${testId}`)
                     .expect(200, expectedFolder);
             });
         });
     });
 
-    describe('POST /api/folders', () => {
+    describe('POST /api/folder', () => {
         it('creates a folder responding with a 201 then the new folder', () => {
             const newFolder = { folder_name: 'New Folder' };
 
             return supertest(app)
-                .post('/api/folders')
+                .post('/api/folder')
                 .send(newFolder)
                 .expect(201)
                 .expect(res => {
@@ -93,7 +93,7 @@ describe('Folder Endpoints', () => {
                 })
                 .then(postRes => {
                     return supertest(app)
-                        .get(`/api/folders/${postRes.body.id}`)
+                        .get(`/api/folder/${postRes.body.id}`)
                         .expect(postRes.body);
                 });
         });
@@ -102,7 +102,7 @@ describe('Folder Endpoints', () => {
             const emptyFolder = { folder_name: '' };
 
             return supertest(app)
-                .post('/api/folders')
+                .post('/api/folder')
                 .send(emptyFolder)
                 .expect(400)
                 .expect({
@@ -114,7 +114,7 @@ describe('Folder Endpoints', () => {
             const { maliciousImgFolder, expectedImgFolder } = makeMaliciousImgFolder();
 
             return supertest(app)
-                .post('/api/folders')
+                .post('/api/folder')
                 .send(maliciousImgFolder)
                 .expect(201)
                 .expect(res => {
@@ -123,13 +123,13 @@ describe('Folder Endpoints', () => {
         });
     });
 
-    describe('DELETE /api/folders/:folder_id', () => {
-        context('given no folders in the database', () => {
+    describe('DELETE /api/folder/:folder_id', () => {
+        context('given no folder in the database', () => {
             it('retuns a 404 and an error for the folder', () => {
                 const testId = 1612;
 
                 return supertest(app)
-                    .delete(`/api/folders/${testId}`)
+                    .delete(`/api/folder/${testId}`)
                     .expect(404)
                     .expect({
                         error: { message: 'Folder does not exist' }
@@ -137,37 +137,37 @@ describe('Folder Endpoints', () => {
             });
         });
 
-        context('given folders in the database', () => {
-            const testFolders = makeFoldersArray();
+        context('given folder in the database', () => {
+            const testFolder = makeFolderArray();
 
-            beforeEach('Add folders to the database', () => {
-                return db.into('folders')
-                    .insert(testFolders);
+            beforeEach('Add folder to the database', () => {
+                return db.into('folder')
+                    .insert(testFolder);
             });
 
             it('deletes the folder and returns a 204', () => {
                 const testId = 2;
-                const expectedFolders = testFolders.filter(folder => folder.id != testId);
+                const expectedFolder = testFolder.filter(folder => folder.id != testId);
 
                 return supertest(app)
-                    .delete(`/api/folders/${testId}`)
+                    .delete(`/api/folder/${testId}`)
                     .expect(204)
                     .then(res =>
                         supertest(app)
-                            .get('/api/folders')
-                            .expect(expectedFolders)
+                            .get('/api/folder')
+                            .expect(expectedFolder)
                     );
             });
         });
     });
 
-    describe('PATCH api/folders/:folder_id', () => {
+    describe('PATCH api/folder/:folder_id', () => {
         context('when there are no items in the database', () => {
             it('retuns a 404 and an error for the folder', () => {
                 const testId = 1612;
 
                 return supertest(app)
-                    .patch(`/api/folders/${testId}`)
+                    .patch(`/api/folder/${testId}`)
                     .expect(404)
                     .expect({
                         error: { message: 'Folder does not exist' }
@@ -176,10 +176,10 @@ describe('Folder Endpoints', () => {
         });
 
         context('When items are in the database', () => {
-            const testFolders = makeFoldersArray();
-            beforeEach('Add folders to database', () => {
-                return db.into('folders')
-                    .insert(testFolders);
+            const testFolder = makeFolderArray();
+            beforeEach('Add folder to database', () => {
+                return db.into('folder')
+                    .insert(testFolder);
             });
 
             it('updates the folder name with a 204', () => {
@@ -188,17 +188,17 @@ describe('Folder Endpoints', () => {
                     folder_name: 'New Folder Name'
                 };
                 const expectedFolder = {
-                    ...testFolders[idToUpdate - 1],
+                    ...testFolder[idToUpdate - 1],
                     ...updateFolder
                 };
 
                 return supertest(app)
-                    .patch(`/api/folders/${idToUpdate}`)
+                    .patch(`/api/folder/${idToUpdate}`)
                     .send(updateFolder)
                     .expect(204)
                     .then(res =>
                         supertest(app)
-                            .get(`/api/folders/${idToUpdate}`)
+                            .get(`/api/folder/${idToUpdate}`)
                             .expect(expectedFolder)
                     )
             });
@@ -209,12 +209,12 @@ describe('Folder Endpoints', () => {
                     folder_name: ''
                 };
                 const expectedFolder = {
-                    ...testFolders[idToUpdate - 1],
+                    ...testFolder[idToUpdate - 1],
                     ...updateFolder
                 };
 
                 return supertest(app)
-                    .patch(`/api/folders/${idToUpdate}`)
+                    .patch(`/api/folder/${idToUpdate}`)
                     .send(updateFolder)
                     .expect(400)
                     .expect({
